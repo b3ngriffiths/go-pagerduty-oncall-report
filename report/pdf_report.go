@@ -96,10 +96,10 @@ func (r *pdfReport) GenerateReport(data *PrintableData) (string, error) {
 					fmt.Sprintf("%v h", userData.NumWorkHours),
 					fmt.Sprintf("%v h", userData.NumWeekendHours),
 					fmt.Sprintf("%v h", userData.NumBankHolidaysHours),
-					tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWorkHours)),
-					tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWeekendHours)),
-					tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmountBankHolidaysHours)),
-					tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmount))),
+					tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWorkHours)),
+					tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWeekendHours)),
+					tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountBankHolidaysHours)),
+					tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmount))),
 				"", 0, "L", false, 0, "")
 			pdf.Ln(3)
 			pdf.CellFormat(0, 5,
@@ -147,10 +147,10 @@ func (r *pdfReport) GenerateReport(data *PrintableData) (string, error) {
 				fmt.Sprintf("%v h", userData.NumWorkHours),
 				fmt.Sprintf("%v h", userData.NumWeekendHours),
 				fmt.Sprintf("%v h", userData.NumBankHolidaysHours),
-				tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWorkHours)),
-				tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWeekendHours)),
-				tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmountBankHolidaysHours)),
-				tr(fmt.Sprintf("%s%v", r.currency, userData.TotalAmount))),
+				tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWorkHours)),
+				tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWeekendHours)),
+				tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountBankHolidaysHours)),
+				tr(fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmount))),
 			"", 0, "L", false, 0, "")
 		pdf.Ln(3)
 		pdf.CellFormat(0, 5,

@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"math"
 	"time"
 
 	"github.com/form3tech-oss/go-pagerduty-oncall-report/api"
@@ -37,6 +38,12 @@ func init() {
 	scheduleReportCmd.Flags().StringVarP(&outputFormat, "output-format", "o", "console", "pdf, console, csv")
 	scheduleReportCmd.Flags().StringVarP(&directory, "output", "d", "", "output path (default is $HOME)")
 	rootCmd.AddCommand(scheduleReportCmd)
+}
+
+// roundCurrency rounds a float32 value to 2 decimal places for clean currency amounts.
+// This prevents messy recurring decimals (e.g., £4.166666) in payment reports.
+func roundCurrency(amount float32) float32 {
+	return float32(math.Round(float64(amount)*100) / 100)
 }
 
 type Schedule struct {
@@ -277,6 +284,14 @@ func calculateSummaryData(data []*report.ScheduleData, pricesInfo *configuration
 		userSummary.NumWorkDays = userSummary.NumWorkHours / float32(pricesInfo.HoursWeekDay)
 		userSummary.NumWeekendDays = userSummary.NumWeekendHours / float32(pricesInfo.HoursWeekendDay)
 		userSummary.NumBankHolidaysDays = userSummary.NumBankHolidaysHours / float32(pricesInfo.HoursBhDay)
+
+		// Round summary totals to handle any accumulated floating-point precision errors
+		// when summing already-rounded amounts from multiple schedules
+		userSummary.TotalAmountWorkHours = roundCurrency(userSummary.TotalAmountWorkHours)
+		userSummary.TotalAmountWeekendHours = roundCurrency(userSummary.TotalAmountWeekendHours)
+		userSummary.TotalAmountBankHolidaysHours = roundCurrency(userSummary.TotalAmountBankHolidaysHours)
+		userSummary.TotalAmount = roundCurrency(userSummary.TotalAmount)
+
 		result = append(result, userSummary)
 	}
 
@@ -388,12 +403,15 @@ func (pd *pagerDutyClient) generateScheduleData(scheduleInfo *api.ScheduleInfo, 
 		scheduleUserData.NumWorkDays = scheduleUserData.NumWorkHours / float32(pricesInfo.HoursWeekDay)
 		scheduleUserData.NumWeekendDays = scheduleUserData.NumWeekendHours / float32(pricesInfo.HoursWeekendDay)
 		scheduleUserData.NumBankHolidaysDays = scheduleUserData.NumBankHolidaysHours / float32(pricesInfo.HoursBhDay)
-		scheduleUserData.TotalAmountWorkHours = scheduleUserData.NumWorkHours * pricesInfo.WeekDayHourlyPrice
-		scheduleUserData.TotalAmountWeekendHours = scheduleUserData.NumWeekendHours * pricesInfo.WeekendDayHourlyPrice
-		scheduleUserData.TotalAmountBankHolidaysHours = scheduleUserData.NumBankHolidaysHours * pricesInfo.BhDayHourlyPrice
-		scheduleUserData.TotalAmount = scheduleUserData.TotalAmountWorkHours +
+
+		// Calculate amounts with full precision, then round to 2 decimal places for clean currency values.
+		// This prevents messy recurring decimals (e.g., £4.166666 per 30-min interval) in reports.
+		scheduleUserData.TotalAmountWorkHours = roundCurrency(scheduleUserData.NumWorkHours * pricesInfo.WeekDayHourlyPrice)
+		scheduleUserData.TotalAmountWeekendHours = roundCurrency(scheduleUserData.NumWeekendHours * pricesInfo.WeekendDayHourlyPrice)
+		scheduleUserData.TotalAmountBankHolidaysHours = roundCurrency(scheduleUserData.NumBankHolidaysHours * pricesInfo.BhDayHourlyPrice)
+		scheduleUserData.TotalAmount = roundCurrency(scheduleUserData.TotalAmountWorkHours +
 			scheduleUserData.TotalAmountWeekendHours +
-			scheduleUserData.TotalAmountBankHolidaysHours
+			scheduleUserData.TotalAmountBankHolidaysHours)
 		scheduleData.RotaUsers = append(scheduleData.RotaUsers, scheduleUserData)
 	}
 
