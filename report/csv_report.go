@@ -127,10 +127,10 @@ func writeUser(userData *ScheduleUser, w *csv.Writer) error {
 		fmt.Sprintf("%.1f", userData.NumWeekendDays),
 		fmt.Sprintf("%v", userData.NumBankHolidaysHours),
 		fmt.Sprintf("%.1f", userData.NumBankHolidaysDays),
-		fmt.Sprintf("%v", userData.TotalAmountWorkHours),
-		fmt.Sprintf("%v", userData.TotalAmountWeekendHours),
-		fmt.Sprintf("%v", userData.TotalAmountBankHolidaysHours),
-		fmt.Sprintf("%v", userData.TotalAmount)}
+		fmt.Sprintf("%.2f", userData.TotalAmountWorkHours),
+		fmt.Sprintf("%.2f", userData.TotalAmountWeekendHours),
+		fmt.Sprintf("%.2f", userData.TotalAmountBankHolidaysHours),
+		fmt.Sprintf("%.2f", userData.TotalAmount)}
 	if err := w.Write(dat); err != nil {
 		log.Println("error writing record to csv:", err)
 		return err
