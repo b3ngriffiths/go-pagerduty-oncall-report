@@ -49,9 +49,9 @@ func (r *consoleReport) GenerateReport(data *PrintableData) (string, error) {
 				fmt.Sprintf("%v h", userData.NumWorkHours),
 				fmt.Sprintf("%v h", userData.NumWeekendHours),
 				fmt.Sprintf("%v h", userData.NumBankHolidaysHours),
-				fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWorkHours),
-				fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWeekendHours),
-				fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountBankHolidaysHours),
+				fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWorkHours),
+				fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWeekendHours),
+				fmt.Sprintf("%s%v", r.currency, userData.TotalAmountBankHolidaysHours),
 				fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmount)))
 			fmt.Println(fmt.Sprintf(rowFormat, userData.EmailAddress,
 				fmt.Sprintf("%.1f d", userData.NumWorkDays),
@@ -80,10 +80,10 @@ func (r *consoleReport) GenerateReport(data *PrintableData) (string, error) {
 			fmt.Sprintf("%v h", userData.NumWorkHours),
 			fmt.Sprintf("%v h", userData.NumWeekendHours),
 			fmt.Sprintf("%v h", userData.NumBankHolidaysHours),
-			fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWorkHours),
-			fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountWeekendHours),
-			fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmountBankHolidaysHours),
-			fmt.Sprintf("%s%.2f", r.currency, userData.TotalAmount)))
+			fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWorkHours),
+			fmt.Sprintf("%s%v", r.currency, userData.TotalAmountWeekendHours),
+			fmt.Sprintf("%s%v", r.currency, userData.TotalAmountBankHolidaysHours),
+			fmt.Sprintf("%s%v", r.currency, userData.TotalAmount)))
 		fmt.Println(fmt.Sprintf(rowFormat, userData.EmailAddress,
 			fmt.Sprintf("%.1f d", userData.NumWorkDays),
 			fmt.Sprintf("%.1f d", userData.NumWeekendDays),

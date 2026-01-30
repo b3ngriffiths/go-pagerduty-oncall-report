@@ -41,7 +41,7 @@ func init() {
 }
 
 // roundCurrency rounds a float32 value to 2 decimal places for clean currency amounts.
-// This prevents messy recurring decimals (e.g., £4.166666) in payment reports.
+// This prevents messy recurring decimals (e.g., £4.166666) in payment totals.
 func roundCurrency(amount float32) float32 {
 	return float32(math.Round(float64(amount)*100) / 100)
 }
@@ -284,14 +284,8 @@ func calculateSummaryData(data []*report.ScheduleData, pricesInfo *configuration
 		userSummary.NumWorkDays = userSummary.NumWorkHours / float32(pricesInfo.HoursWeekDay)
 		userSummary.NumWeekendDays = userSummary.NumWeekendHours / float32(pricesInfo.HoursWeekendDay)
 		userSummary.NumBankHolidaysDays = userSummary.NumBankHolidaysHours / float32(pricesInfo.HoursBhDay)
-
-		// Round summary totals to handle any accumulated floating-point precision errors
-		// when summing already-rounded amounts from multiple schedules
-		userSummary.TotalAmountWorkHours = roundCurrency(userSummary.TotalAmountWorkHours)
-		userSummary.TotalAmountWeekendHours = roundCurrency(userSummary.TotalAmountWeekendHours)
-		userSummary.TotalAmountBankHolidaysHours = roundCurrency(userSummary.TotalAmountBankHolidaysHours)
+		// Round only the total amount for clean final payment value in summaries
 		userSummary.TotalAmount = roundCurrency(userSummary.TotalAmount)
-
 		result = append(result, userSummary)
 	}
 
@@ -403,12 +397,10 @@ func (pd *pagerDutyClient) generateScheduleData(scheduleInfo *api.ScheduleInfo, 
 		scheduleUserData.NumWorkDays = scheduleUserData.NumWorkHours / float32(pricesInfo.HoursWeekDay)
 		scheduleUserData.NumWeekendDays = scheduleUserData.NumWeekendHours / float32(pricesInfo.HoursWeekendDay)
 		scheduleUserData.NumBankHolidaysDays = scheduleUserData.NumBankHolidaysHours / float32(pricesInfo.HoursBhDay)
-
-		// Calculate amounts with full precision, then round to 2 decimal places for clean currency values.
-		// This prevents messy recurring decimals (e.g., £4.166666 per 30-min interval) in reports.
-		scheduleUserData.TotalAmountWorkHours = roundCurrency(scheduleUserData.NumWorkHours * pricesInfo.WeekDayHourlyPrice)
-		scheduleUserData.TotalAmountWeekendHours = roundCurrency(scheduleUserData.NumWeekendHours * pricesInfo.WeekendDayHourlyPrice)
-		scheduleUserData.TotalAmountBankHolidaysHours = roundCurrency(scheduleUserData.NumBankHolidaysHours * pricesInfo.BhDayHourlyPrice)
+		scheduleUserData.TotalAmountWorkHours = scheduleUserData.NumWorkHours * pricesInfo.WeekDayHourlyPrice
+		scheduleUserData.TotalAmountWeekendHours = scheduleUserData.NumWeekendHours * pricesInfo.WeekendDayHourlyPrice
+		scheduleUserData.TotalAmountBankHolidaysHours = scheduleUserData.NumBankHolidaysHours * pricesInfo.BhDayHourlyPrice
+		// Round only the total amount to 2 decimal places for clean final payment value
 		scheduleUserData.TotalAmount = roundCurrency(scheduleUserData.TotalAmountWorkHours +
 			scheduleUserData.TotalAmountWeekendHours +
 			scheduleUserData.TotalAmountBankHolidaysHours)
